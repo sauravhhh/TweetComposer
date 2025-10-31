@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tweet Composer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fab fa-twitter"></i> Tweet Composer</h1>
+        </header>
+
+        <div class="tab-container">
+            <button class="tab active" onclick="switchTab('compose')">
+                <i class="fas fa-pen"></i> Compose
+            </button>
+            <button class="tab" onclick="switchTab('preview')">
+                <i class="fas fa-eye"></i> Preview
+            </button>
+            <button class="tab" onclick="switchTab('drafts')">
+                <i class="fas fa-file-alt"></i> Drafts
+            </button>
+        </div>
+
+        <div id="compose-tab" class="tab-content active">
+            <div class="file-upload" onclick="document.getElementById('file-input').click()">
+                <input type="file" id="file-input" accept="image/*,video/*" onchange="handleFileSelect(event)">
+                <label for="file-input" class="file-upload-label">
+                    <i class="fas fa-image" style="font-size: 24px; color: #1a73e8;"></i>
+                    <span>Upload Media</span>
+                    <small style="color: #5f6368;">JPG, PNG, GIF, MP4 (Max 5MB)</small>
+                </label>
+            </div>
+            
+            <div id="file-preview-container" style="display: none;">
+                <div class="file-preview">
+                    <img id="preview-image" src="" alt="Preview">
+                    <div class="file-info">
+                        <div class="file-name" id="file-name"></div>
+                        <div class="file-size" id="file-size"></div>
+                    </div>
+                    <i class="fas fa-times remove-file" onclick="removeFile()"></i>
+                </div>
+            </div>
+            
+            <div class="tweet-compose">
+                <textarea id="tweet-text" placeholder="What's happening?"></textarea>
+                <div class="compose-footer">
+                    <div id="char-counter" class="char-counter">0/280</div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="saveDraft()">
+                            <i class="fas fa-save"></i> Save Draft
+                        </button>
+                        <button class="btn btn-primary" onclick="exportTweet()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="preview-tab" class="tab-content">
+            <div id="preview-container">
+                <div class="preview-tweet">
+                    <div class="preview-header">
+                        <div class="preview-avatar">U</div>
+                        <div class="preview-info">
+                            <div class="preview-name">Your Name</div>
+                            <div class="preview-username">@username</div>
+                        </div>
+                    </div>
+                    <div class="preview-content" id="preview-content">Your tweet will appear here...</div>
+                    <div id="preview-media" class="preview-media" style="display: none;">
+                        <img id="preview-media-image" src="" alt="Media">
+                    </div>
+                    <div class="preview-actions">
+                        <span><i class="far fa-comment"></i> 0</span>
+                        <span><i class="fas fa-retweet"></i> 0</span>
+                        <span><i class="far fa-heart"></i> 0</span>
+                        <span><i class="fas fa-share"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="drafts-tab" class="tab-content">
+            <h3 style="margin-bottom: 15px;">Saved Drafts</h3>
+            <div id="drafts-list" class="drafts-container">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-danger" onclick="clearAllDrafts()">
+                    <i class="fas fa-trash"></i> Clear All Drafts
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Made with ❤️ by Sauravhhh
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
