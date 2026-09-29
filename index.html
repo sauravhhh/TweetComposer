@@ -3,106 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tweet Composer</title>
+    <title>TweetComposer — Write threads like a pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script>
+    (function(){try{var t=localStorage.getItem('tc-theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+    </script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fab fa-twitter"></i> Tweet Composer</h1>
-        </header>
+    <header class="topbar">
+        <div class="brand"><i class="fa-brands fa-x-twitter"></i><span>TweetComposer</span></div>
+        <button id="theme-btn" class="icon-btn" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+    </header>
 
-        <div class="tab-container">
-            <button class="tab active" onclick="switchTab('compose')">
-                <i class="fas fa-pen"></i> Compose
-            </button>
-            <button class="tab" onclick="switchTab('preview')">
-                <i class="fas fa-eye"></i> Preview
-            </button>
-            <button class="tab" onclick="switchTab('drafts')">
-                <i class="fas fa-file-alt"></i> Drafts
-            </button>
-        </div>
+    <nav class="tabs">
+        <button class="tab active" data-tab="compose"><i class="fas fa-pen"></i><span>Compose</span></button>
+        <button class="tab" data-tab="preview"><i class="fas fa-eye"></i><span>Preview</span></button>
+        <button class="tab" data-tab="drafts"><i class="fas fa-folder-open"></i><span>Drafts</span><b id="draft-count" class="badge" hidden></b></button>
+    </nav>
 
-        <div id="compose-tab" class="tab-content active">
-            <div class="file-upload" onclick="document.getElementById('file-input').click()">
-                <input type="file" id="file-input" accept="image/*,video/*" onchange="handleFileSelect(event)">
-                <label for="file-input" class="file-upload-label">
-                    <i class="fas fa-image" style="font-size: 24px; color: #1a73e8;"></i>
-                    <span>Upload Media</span>
-                    <small style="color: #5f6368;">JPG, PNG, GIF, MP4 (Max 5MB)</small>
-                </label>
+    <main>
+        <!-- COMPOSE -->
+        <section id="tab-compose" class="panel active">
+            <div class="card profile-card">
+                <div class="avatar" id="profile-avatar">U</div>
+                <div class="profile-meta">
+                    <div class="profile-name"><span id="profile-name">Your Name</span><i id="verified-badge" class="fas fa-circle-check verified" hidden></i></div>
+                    <div class="profile-handle" id="profile-handle">@username</div>
+                </div>
+                <button class="btn btn-ghost" id="edit-profile-btn"><i class="fas fa-user-pen"></i><span>Profile</span></button>
             </div>
-            
-            <div id="file-preview-container" style="display: none;">
-                <div class="file-preview">
-                    <img id="preview-image" src="" alt="Preview">
-                    <div class="file-info">
-                        <div class="file-name" id="file-name"></div>
-                        <div class="file-size" id="file-size"></div>
-                    </div>
-                    <i class="fas fa-times remove-file" onclick="removeFile()"></i>
+
+            <div id="thread-list"></div>
+
+            <div class="row actions-row">
+                <button class="btn btn-ghost" id="add-tweet-btn"><i class="fas fa-plus"></i><span>Add tweet</span></button>
+                <button class="btn btn-ghost" id="autosplit-btn"><i class="fas fa-wand-magic-sparkles"></i><span>Auto-split</span></button>
+                <label class="check"><input type="checkbox" id="numbering" checked><span>Number thread</span></label>
+            </div>
+
+            <div class="card stats-card" id="stats-bar"></div>
+
+            <div class="row actions-row wrap">
+                <button class="btn btn-primary" id="copy-btn"><i class="fas fa-copy"></i><span>Copy</span></button>
+                <button class="btn btn-secondary" id="save-draft-btn"><i class="fas fa-save"></i><span>Save draft</span></button>
+                <button class="btn btn-secondary" id="export-btn"><i class="fas fa-download"></i><span>Export .txt</span></button>
+                <button class="btn btn-danger-ghost" id="clear-btn" title="Clear thread"><i class="fas fa-trash"></i></button>
+            </div>
+            <p class="hint">Tip: press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> inside any tweet box to save a draft.</p>
+        </section>
+
+        <!-- PREVIEW -->
+        <section id="tab-preview" class="panel">
+            <div class="card engagement-card">
+                <div class="eng-title">Mock engagement</div>
+                <div class="eng-row">
+                    <label title="Replies"><i class="far fa-comment"></i><input type="number" id="eng-replies" value="12" min="0"></label>
+                    <label title="Reposts"><i class="fas fa-retweet"></i><input type="number" id="eng-rts" value="24" min="0"></label>
+                    <label title="Likes"><i class="far fa-heart"></i><input type="number" id="eng-likes" value="128" min="0"></label>
+                    <label title="Views"><i class="far fa-chart-bar"></i><input type="number" id="eng-views" value="1500" min="0"></label>
                 </div>
             </div>
-            
-            <div class="tweet-compose">
-                <textarea id="tweet-text" placeholder="What's happening?"></textarea>
-                <div class="compose-footer">
-                    <div id="char-counter" class="char-counter">0/280</div>
-                    <div class="btn-group">
-                        <button class="btn btn-secondary" onclick="saveDraft()">
-                            <i class="fas fa-save"></i> Save Draft
-                        </button>
-                        <button class="btn btn-primary" onclick="exportTweet()">
-                            <i class="fas fa-download"></i> Export
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <div id="preview-list" class="preview-list"></div>
+        </section>
 
-        <div id="preview-tab" class="tab-content">
-            <div id="preview-container">
-                <div class="preview-tweet">
-                    <div class="preview-header">
-                        <div class="preview-avatar">U</div>
-                        <div class="preview-info">
-                            <div class="preview-name">Your Name</div>
-                            <div class="preview-username">@username</div>
-                        </div>
-                    </div>
-                    <div class="preview-content" id="preview-content">Your tweet will appear here...</div>
-                    <div id="preview-media" class="preview-media" style="display: none;">
-                        <img id="preview-media-image" src="" alt="Media">
-                    </div>
-                    <div class="preview-actions">
-                        <span><i class="far fa-comment"></i> 0</span>
-                        <span><i class="fas fa-retweet"></i> 0</span>
-                        <span><i class="far fa-heart"></i> 0</span>
-                        <span><i class="fas fa-share"></i></span>
-                    </div>
-                </div>
+        <!-- DRAFTS -->
+        <section id="tab-drafts" class="panel">
+            <div class="row drafts-head">
+                <h3>Saved drafts</h3>
+                <button class="btn btn-danger-ghost" id="clear-drafts-btn"><i class="fas fa-trash"></i><span>Clear all</span></button>
             </div>
-        </div>
+            <div id="drafts-list"></div>
+        </section>
+    </main>
 
-        <div id="drafts-tab" class="tab-content">
-            <h3 style="margin-bottom: 15px;">Saved Drafts</h3>
-            <div id="drafts-list" class="drafts-container">
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-danger" onclick="clearAllDrafts()">
-                    <i class="fas fa-trash"></i> Clear All Drafts
-                </button>
+    <!-- Profile modal -->
+    <div class="modal-backdrop" id="profile-modal" hidden>
+        <div class="modal" role="dialog" aria-label="Edit profile">
+            <h3>Edit profile</h3>
+            <label class="field">Display name<input type="text" id="pf-name" maxlength="50" placeholder="Your Name"></label>
+            <label class="field">Handle<input type="text" id="pf-handle" maxlength="15" placeholder="username"></label>
+            <label class="check"><input type="checkbox" id="pf-verified"><span>Verified badge</span></label>
+            <label class="field">Avatar<input type="file" id="pf-avatar" accept="image/*"></label>
+            <div class="row modal-actions">
+                <button class="btn btn-primary" id="pf-save"><i class="fas fa-check"></i><span>Save</span></button>
+                <button class="btn btn-ghost" id="pf-cancel">Cancel</button>
             </div>
         </div>
     </div>
 
-    <footer>
-        Made with ❤️ by Sauravhhh
-    </footer>
+    <div class="emoji-picker" id="emoji-picker" hidden></div>
+    <div class="toast" id="toast"></div>
 
-    <div id="toast" class="toast"></div>
+    <footer>Made with ❤️ by sauravhhh</footer>
 
     <script src="script.js"></script>
 </body>
